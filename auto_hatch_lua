@@ -1,0 +1,29 @@
+-- Auto hatch + log pet // Delta Executor Ready
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+local eggName = "BasicEgg"  -- Ganti jika ada nama lain
+local openEggRemote = ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("OpenEgg")
+
+local function logPet()
+    local petsFolder = Player:FindFirstChild("Pets")
+    if petsFolder then
+        for _, pet in pairs(petsFolder:GetChildren()) do
+            print("🐾 Kamu mendapatkan pet:", pet.Name)
+        end
+    end
+end
+
+while true do
+    task.wait(2)
+    if openEggRemote then
+        print("🎉 Membuka egg:", eggName)
+        openEggRemote:InvokeServer(eggName, false)
+        task.wait(1)
+        logPet()
+    else
+        warn("❌ Remote 'OpenEgg' tidak ditemukan, periksa struktur game.")
+        break
+    end
+end
