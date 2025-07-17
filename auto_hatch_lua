@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 
-local eggName = "BasicEgg"  -- Ganti jika ada nama lain
+local eggName = "Dinosaur Egg"  -- Ganti jika ada nama lain
 local openEggRemote = ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("OpenEgg")
 
 local function logPet()
