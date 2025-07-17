@@ -1,44 +1,57 @@
--- Grow a Garden Auto Hatch with GUI by Adiatma 🧪 Mythical Egg Ready
+-- 🧪 Grow a Garden Auto Hatch GUI by Adiatma + Fix by ChatGPT
+-- ✅ Supports Mythical Egg, GUI, Auto Hatch, Anti-AFK
+
+-- Anti-AFK
+task.spawn(function()
+    local vu = game:GetService("VirtualUser")
+    game:GetService("Players").LocalPlayer.Idled:Connect(function()
+        vu:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        vu:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    end)
+end)
+
+-- Services
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Player = Players.LocalPlayer
 
--- Daftar egg (kamu bisa tambah lagi kalau mau)
+-- Egg List
 local eggList = {"Mythical Egg", "DinosaurusEgg", "GoldenEgg", "SugarAppleEgg"}
-local selectedEgg = eggList[1] -- Default: Mythical Egg
+local selectedEgg = eggList[1]
 local isHatching = false
 
 -- GUI Setup
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-ScreenGui.Name = "AutoHatchGUI"
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "AutoHatchGUI"
 
-local Frame = Instance.new("Frame", ScreenGui)
-Frame.Size = UDim2.new(0, 230, 0, 140)
-Frame.Position = UDim2.new(0, 20, 0, 100)
-Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-Frame.BorderSizePixel = 0
-Frame.BackgroundTransparency = 0.2
-Frame.Active = true
-Frame.Draggable = true
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 230, 0, 140)
+frame.Position = UDim2.new(0, 20, 0, 100)
+frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+frame.BorderSizePixel = 0
+frame.BackgroundTransparency = 0.2
+frame.Active = true
+frame.Draggable = true
 
-local Title = Instance.new("TextLabel", Frame)
-Title.Text = "🥚 Auto Hatch GUI"
-Title.Size = UDim2.new(1, 0, 0, 30)
-Title.BackgroundTransparency = 1
-Title.TextColor3 = Color3.new(1, 1, 1)
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 18
+local title = Instance.new("TextLabel", frame)
+title.Text = "🥚 Auto Hatch GUI"
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
 
-local Dropdown = Instance.new("TextButton", Frame)
-Dropdown.Text = "📦 Pilih Egg"
-Dropdown.Size = UDim2.new(1, -20, 0, 30)
-Dropdown.Position = UDim2.new(0, 10, 0, 40)
-Dropdown.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Dropdown.TextColor3 = Color3.new(1, 1, 1)
-Dropdown.Font = Enum.Font.Gotham
-Dropdown.TextSize = 14
+local dropdown = Instance.new("TextButton", frame)
+dropdown.Text = "📦 Pilih Egg"
+dropdown.Size = UDim2.new(1, -20, 0, 30)
+dropdown.Position = UDim2.new(0, 10, 0, 40)
+dropdown.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+dropdown.TextColor3 = Color3.new(1, 1, 1)
+dropdown.Font = Enum.Font.Gotham
+dropdown.TextSize = 14
 
-local selectedLabel = Instance.new("TextLabel", Frame)
+local selectedLabel = Instance.new("TextLabel", frame)
 selectedLabel.Text = "Selected: " .. selectedEgg
 selectedLabel.Size = UDim2.new(1, -20, 0, 20)
 selectedLabel.Position = UDim2.new(0, 10, 0, 75)
@@ -47,37 +60,41 @@ selectedLabel.TextColor3 = Color3.new(1, 1, 1)
 selectedLabel.Font = Enum.Font.Gotham
 selectedLabel.TextSize = 12
 
-local Toggle = Instance.new("TextButton", Frame)
-Toggle.Text = "▶️ Start"
-Toggle.Size = UDim2.new(1, -20, 0, 30)
-Toggle.Position = UDim2.new(0, 10, 0, 100)
-Toggle.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-Toggle.TextColor3 = Color3.new(1, 1, 1)
-Toggle.Font = Enum.Font.GothamBold
-Toggle.TextSize = 14
+local toggle = Instance.new("TextButton", frame)
+toggle.Text = "▶️ Start"
+toggle.Size = UDim2.new(1, -20, 0, 30)
+toggle.Position = UDim2.new(0, 10, 0, 100)
+toggle.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+toggle.TextColor3 = Color3.new(1, 1, 1)
+toggle.Font = Enum.Font.GothamBold
+toggle.TextSize = 14
 
--- Dropdown logic
-Dropdown.MouseButton1Click:Connect(function()
-    local nextIndex = table.find(eggList, selectedEgg) + 1
-    if nextIndex > #eggList then nextIndex = 1 end
-    selectedEgg = eggList[nextIndex]
+-- Dropdown: Ganti Egg
+dropdown.MouseButton1Click:Connect(function()
+    local i = table.find(eggList, selectedEgg) + 1
+    if i > #eggList then i = 1 end
+    selectedEgg = eggList[i]
     selectedLabel.Text = "Selected: " .. selectedEgg
 end)
 
--- Hatching logic
-Toggle.MouseButton1Click:Connect(function()
+-- Toggle Auto Hatch
+toggle.MouseButton1Click:Connect(function()
     isHatching = not isHatching
-    Toggle.Text = isHatching and "⏹ Stop" or "▶️ Start"
+    toggle.Text = isHatching and "⏹ Stop" or "▶️ Start"
 
-    while isHatching do
-        local openEggRemote = ReplicatedStorage:FindFirstChild("Remotes"):FindFirstChild("OpenEgg")
-        if openEggRemote then
-            openEggRemote:InvokeServer(selectedEgg, false)
-            print("🎉 Membuka:", selectedEgg)
-        else
-            warn("Remote OpenEgg tidak ditemukan.")
-            break
+    task.spawn(function()
+        while isHatching do
+            local hatchRemote = ReplicatedStorage:FindFirstChild("Remotes"):FindFirstChild("Hatch")
+            if hatchRemote then
+                pcall(function()
+                    hatchRemote:InvokeServer(selectedEgg, false)
+                    print("🎉 Menetaskan:", selectedEgg)
+                end)
+            else
+                warn("❌ Remote 'Hatch' tidak ditemukan.")
+                break
+            end
+            task.wait(1.5)
         end
-        wait(2)
-    end
+    end)
 end)
